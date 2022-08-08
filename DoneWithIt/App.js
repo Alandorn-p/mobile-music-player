@@ -11,17 +11,18 @@ import {
   StatusBar,
 } from "react-native";
 
+import { NavigationContainer } from "@react-navigation/native";
+import AppNavigation from "./app/navigation/AppNavigation";
+import AudioProvider from "./app/context/AudioProvider";
+import AudioListItem from "./app/components/AudioListItem";
+
 export default function App() {
-  let x = 1;
-  console.log("app started");
-  const pressStuff = () => console.log("pressed");
-  const alertStuff = () => null;
   return (
-    <SafeAreaView style={styles.container}>
-      <View
-        style={{ backgroundColor: "dodgerblue", width: "50%", height: 80 }}
-      ></View>
-    </SafeAreaView>
+    <AudioProvider>
+      <NavigationContainer>
+        <AppNavigation />
+      </NavigationContainer>
+    </AudioProvider>
   );
 }
 
@@ -31,8 +32,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    // alignItems: "center",
-    // justifyContent: "center",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    alignItems: "center",
+    justifyContent: "center",
+    //paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
 });
