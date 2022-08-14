@@ -20,20 +20,39 @@ function thumbnailExtracter(text) {
   }
   return thumbnail.toUpperCase();
 }
+
+const renderPlayPauseIcon = (isPlaying) => {
+  if (isPlaying)
+    return (
+      <Entypo name="controller-play" size={24} color={color.ACTIVE_FONT} />
+    );
+  return <Entypo name="controller-paus" size={24} color="black" />;
+};
 export default function AudioListItem({
   title,
   duration,
   onAudioPress,
   onOptionPress,
+  isPlaying,
+  active,
 }) {
   return (
     <View>
       <View style={styles.container}>
         <TouchableWithoutFeedback onPress={onAudioPress}>
           <View style={styles.leftContainer}>
-            <View style={styles.thumbnail}>
+            <View
+              style={[
+                styles.thumbnail,
+                {
+                  backgroundColor: active ? color.ACTIVE_BG : color.FONT_LIGHT,
+                },
+              ]}
+            >
               <Text style={styles.thumbnailText}>
-                {thumbnailExtracter(title)}
+                {active
+                  ? renderPlayPauseIcon(isPlaying)
+                  : thumbnailExtracter(title)}
               </Text>
             </View>
             <View style={styles.titleContainer}>
@@ -54,9 +73,7 @@ export default function AudioListItem({
           />
         </View>
       </View>
-      <View style={styles.seperatorView}>
-        <Text>Heigh</Text>
-      </View>
+      <View style={styles.seperatorView}></View>
     </View>
   );
 }
@@ -76,6 +93,7 @@ const styles = StyleSheet.create({
   leftContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     flex: 1,
   },
   rightContainer: {

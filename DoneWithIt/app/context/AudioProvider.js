@@ -13,6 +13,11 @@ export class AudioProvider extends Component {
       audioFiles: [],
       PermissionError: false,
       dataProvider: new DataProvider((r1, r2) => r1 !== r2),
+      playbackObj: null,
+      soundObj: null,
+      currentAudio: {},
+      isPlaying: false,
+      currentAudio: null,
     };
   }
 
@@ -87,8 +92,21 @@ export class AudioProvider extends Component {
     console.log(this.props.children);
     return this.props.children;
   }
+
+  updateState = (prevState, newState = {}) => {
+    this.setState({ ...prevState, ...newState });
+  };
   render() {
-    const { PermissionError, dataProvider, audioFiles } = this.state;
+    const {
+      PermissionError,
+      dataProvider,
+      audioFiles,
+      playbackObj,
+      soundObj,
+      currentAudio,
+      isPlaying,
+      currentAudioTitle,
+    } = this.state;
     if (PermissionError) {
       return (
         <View style={styles.viewError}>
@@ -101,6 +119,12 @@ export class AudioProvider extends Component {
           value={{
             audioFiles,
             dataProvider,
+            playbackObj,
+            soundObj,
+            currentAudio,
+            updateState: this.updateState,
+            isPlaying,
+            currentAudioTitle,
           }}
         >
           {this.props.children}
