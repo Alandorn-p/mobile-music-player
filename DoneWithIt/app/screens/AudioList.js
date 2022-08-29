@@ -21,23 +21,78 @@ export class AudioList extends Component {
     super(props);
     this.state = {
       OptionModalVisible: false,
+      curSongIndex: 0,
+      randomSongList: null,
     };
     this.currentItem = {};
   }
 
-  layoutProvider = new LayoutProvider(
-    (i) => "audio",
-    (type, dim) => {
-      switch (type) {
-        case "audio":
-          dim.width = Dimensions.get("window").width;
-          dim.height = 70;
-          break;
-        default:
-          dim.width = dim.height = 0;
+  randomListGen = (len) => {
+    alist = Array.from(Array(len).keys());
+    for (let i = alist.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      let temp = alist[i];
+      alist[i] = alist[j];
+      alist[j] = temp;
+    }
+    console.log(alist);
+    return alist;
+  };
+
+  resetRandomPlaylist() {
+    this.setState({
+      ...this.setState,
+      randomSongList: this.randomListGen(this.context.audioFiles.length),
+      curSongIndex: 0,
+    });
+  }
+
+  _onPlaybackStatusUpdate = async (playbackStatus) => {
+    const { updateState, audioFiles, playbackObj } = this.context;
+    if (!playbackStatus.isLoaded) {
+      // Update your UI for the unloaded state
+      if (playbackStatus.error) {
+        console.log(
+          `Encountered a fatal error during playback: ${playbackStatus.error}`
+        );
+        // Send Expo team the error on Slack or the forums so we can help you debug!
+      }
+    } else {
+      // Update your UI for the loaded state
+
+      if (playbackStatus.isPlaying) {
+        // Update your UI for the playing state
+      } else {
+        // Update your UI for the paused state
+      }
+
+      if (playbackStatus.isBuffering) {
+        // Update your UI for the buffering state
+      }
+
+      if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
+        // The player has just finished playing and will stop. Maybe you want to play something else?
+        console.log("finished playing");
+        let nextSongIndex = this.state.curSongIndex + 1;
+        if (nextSongIndex === audioFiles.length) {
+          this.resetRandomPlaylist();
+        } else {
+          this.setState({ ...this.setState, curSongIndex: nextSongIndex });
+        }
+
+        let audio =
+          audioFiles[this.state.randomSongList[this.state.curSongIndex]];
+        // console.log(playbackObj);
+        const status = await playNext(playbackObj, audio.uri);
+        updateState(this.context, {
+          soundObj: status,
+          currentAudio: audio,
+          isPlaying: true,
+          currentAudioTitle: audio.filename,
+        });
       }
     }
-  );
+  };
   async handleAudioPress(audio) {
     const {
       soundObj,
@@ -47,18 +102,20 @@ export class AudioList extends Component {
       currentAudioTitle,
     } = this.context;
     console.log("Pressed on: ", audio.uri);
-    //await Audio.setAudioModeAsync({ staysActiveInBackground: true });
+
     if (soundObj === null) {
       // if nothing is playing (first time)
       const playbackObj = new Audio.Sound();
+      this.resetRandomPlaylist();
+
       const status = await play(playbackObj, audio.uri);
       updateState(this.context, {
-        playbackObj: playbackObj,
+        playbackObj,
         soundObj: status,
         currentAudio: audio,
-        isPlaying: true,
         currentAudioTitle: audio.filename,
       });
+      playbackObj.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
       return;
     }
     //pause audio
@@ -89,6 +146,7 @@ export class AudioList extends Component {
       //soundObj.isLoaded &&
       currentAudio.id !== audio.id
     ) {
+      this.resetRandomPlaylist();
       const status = await playNext(playbackObj, audio.uri);
       updateState(this.context, {
         soundObj: status,
@@ -104,6 +162,28 @@ export class AudioList extends Component {
     console.log(x === y);
     return x === y;
   }
+  componentDidMount() {
+    Audio.setAudioModeAsync({
+      staysActiveInBackground: true,
+      interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+      //playThroughEarpieceAndroid: true,
+    });
+  }
+
+  layoutProvider = new LayoutProvider(
+    (i) => "audio",
+    (type, dim) => {
+      switch (type) {
+        case "audio":
+          dim.width = Dimensions.get("window").width;
+          dim.height = 70;
+          break;
+        default:
+          dim.width = dim.height = 0;
+      }
+    }
+  );
+
   rowRenderer = (type, item, index, extendedState) => {
     return (
       <AudioListItem

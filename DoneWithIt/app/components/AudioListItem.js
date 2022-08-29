@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignSelf: "center",
     width: rowWidth,
+    height: 50,
     //backgroundColor: "red",
   },
   leftContainer: {

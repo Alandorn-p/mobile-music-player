@@ -63,7 +63,14 @@ export class AudioProvider extends Component {
   filterAudioFilesFunc(item) {
     //only take mp3 files and files in the right directory
     const filePath = "Music/MusicApp";
-    return item.uri.includes(filePath) && item.filename.endsWith(".mp3");
+    return (
+      item.uri.includes(filePath) &&
+      item.filename.endsWith(".mp3") &&
+      !item.uri.includes("Test_folder")
+    );
+
+    // const filePath = "Music/MusicApp/Test_folder";
+    // return item.uri.includes(filePath) && item.filename.endsWith(".mp3");
   }
 
   getAudioFiles = async () => {
