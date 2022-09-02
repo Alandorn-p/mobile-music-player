@@ -15,10 +15,12 @@ export class AudioProvider extends Component {
       dataProvider: new DataProvider((r1, r2) => r1 !== r2),
       playbackObj: null,
       soundObj: null,
-      currentAudio: {},
       isPlaying: false,
       currentAudio: null,
+      playbackPos: null,
+      playbackDur: null,
     };
+    this.totalAudioCount = 0;
   }
 
   permissionAlert = () => {
@@ -113,6 +115,8 @@ export class AudioProvider extends Component {
       currentAudio,
       isPlaying,
       currentAudioTitle,
+      playbackDur,
+      playbackPos,
     } = this.state;
     if (PermissionError) {
       return (
@@ -129,9 +133,11 @@ export class AudioProvider extends Component {
             playbackObj,
             soundObj,
             currentAudio,
-            updateState: this.updateState,
             isPlaying,
             currentAudioTitle,
+            playbackDur,
+            playbackPos,
+            updateState: this.updateState,
           }}
         >
           {this.props.children}

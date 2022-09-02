@@ -35,7 +35,7 @@ export class AudioList extends Component {
       alist[i] = alist[j];
       alist[j] = temp;
     }
-    console.log(alist);
+    // console.log(alist);
     return alist;
   };
 
@@ -61,6 +61,10 @@ export class AudioList extends Component {
       // Update your UI for the loaded state
 
       if (playbackStatus.isPlaying) {
+        this.context.updateState(this.context, {
+          playbackPos: playbackStatus.positionMillis,
+          playbackDur: playbackStatus.durationMillis,
+        });
         // Update your UI for the playing state
       } else {
         // Update your UI for the paused state
@@ -114,6 +118,7 @@ export class AudioList extends Component {
         soundObj: status,
         currentAudio: audio,
         currentAudioTitle: audio.filename,
+        isPlaying: true,
       });
       playbackObj.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
       return;
