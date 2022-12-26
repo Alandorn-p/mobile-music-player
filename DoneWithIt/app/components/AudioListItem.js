@@ -10,7 +10,9 @@ import { Entypo } from "@expo/vector-icons";
 import color from "../misc/color";
 
 function secToMin(duration) {
-  return `${Math.floor(duration / 60)}:${Math.round(duration % 60)}`;
+  let sec = Math.round(duration % 60);
+  sec = ("0" + sec.toString()).slice(-2);
+  return `${Math.floor(duration / 60)}:${sec}`;
 }
 
 function thumbnailExtracter(text) {

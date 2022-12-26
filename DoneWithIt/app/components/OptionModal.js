@@ -9,7 +9,12 @@ import {
 import React from "react";
 import color from "../misc/color";
 
-export default function OptionModal({ visible, currentItem, onClose }) {
+export default function OptionModal({
+  visible,
+  currentItem,
+  onClose,
+  toggleRepeat,
+}) {
   const { filename } = currentItem;
   return (
     <>
@@ -20,8 +25,8 @@ export default function OptionModal({ visible, currentItem, onClose }) {
             {filename}
           </Text>
           <View style={styles.optionContainer}>
-            <TouchableWithoutFeedback>
-              <Text style={styles.option}>Play</Text>
+            <TouchableWithoutFeedback onPress={toggleRepeat}>
+              <Text style={styles.option}>Toggle Repeat</Text>
             </TouchableWithoutFeedback>
             <TouchableWithoutFeedback>
               <Text style={styles.option}>Add to playlist</Text>

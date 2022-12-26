@@ -23,6 +23,7 @@ export class AudioList extends Component {
       OptionModalVisible: false,
       curSongIndex: 0,
       randomSongList: null,
+      repeatSong: false,
     };
     this.currentItem = {};
   }
@@ -39,10 +40,18 @@ export class AudioList extends Component {
     return alist;
   };
 
-  resetRandomPlaylist() {
+  resetRandomPlaylist(audio) {
+    const { audioFiles } = this.context;
+    const lst = this.randomListGen(this.context.audioFiles.length);
+    if (audio !== null) {
+      const ind = audioFiles.indexOf(audio);
+      const ind_in_lst = lst.indexOf(ind);
+      //swap
+      [lst[0], lst[ind_in_lst]] = [lst[ind_in_lst], lst[0]];
+    }
     this.setState({
       ...this.setState,
-      randomSongList: this.randomListGen(this.context.audioFiles.length),
+      randomSongList: lst,
       curSongIndex: 0,
     });
   }
@@ -77,9 +86,11 @@ export class AudioList extends Component {
       if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
         // The player has just finished playing and will stop. Maybe you want to play something else?
         console.log("finished playing");
-        let nextSongIndex = this.state.curSongIndex + 1;
+        let nextSongIndex = this.state.repeatSong
+          ? this.state.curSongIndex
+          : this.state.curSongIndex + 1;
         if (nextSongIndex === audioFiles.length) {
-          this.resetRandomPlaylist();
+          this.resetRandomPlaylist(null);
         } else {
           this.setState({ ...this.setState, curSongIndex: nextSongIndex });
         }
@@ -110,7 +121,7 @@ export class AudioList extends Component {
     if (soundObj === null) {
       // if nothing is playing (first time)
       const playbackObj = new Audio.Sound();
-      this.resetRandomPlaylist();
+      this.resetRandomPlaylist(audio);
 
       const status = await play(playbackObj, audio.uri);
       updateState(this.context, {
@@ -151,7 +162,7 @@ export class AudioList extends Component {
       //soundObj.isLoaded &&
       currentAudio.id !== audio.id
     ) {
-      this.resetRandomPlaylist();
+      this.resetRandomPlaylist(audio);
       const status = await playNext(playbackObj, audio.uri);
       updateState(this.context, {
         soundObj: status,
@@ -224,6 +235,12 @@ export class AudioList extends Component {
                   this.setState({
                     ...this.state,
                     OptionModalVisible: false,
+                  })
+                }
+                toggleRepeat={() =>
+                  this.setState({
+                    ...this.state,
+                    repeatSong: !this.state.repeatSong,
                   })
                 }
               />

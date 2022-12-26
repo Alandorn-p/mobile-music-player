@@ -2,6 +2,8 @@ import React, { Component, createContext } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import * as MediaLibrary from "expo-media-library";
 import { DataProvider } from "recyclerlistview";
+import * as FileSystem from "expo-file-system";
+const { StorageAccessFramework } = FileSystem;
 
 export const AudioContext = createContext();
 export class AudioProvider extends Component {
@@ -19,6 +21,7 @@ export class AudioProvider extends Component {
       currentAudio: null,
       playbackPos: null,
       playbackDur: null,
+      repeatOn: false,
     };
     this.totalAudioCount = 0;
   }
@@ -74,6 +77,12 @@ export class AudioProvider extends Component {
     // const filePath = "Music/MusicApp/Test_folder";
     // return item.uri.includes(filePath) && item.filename.endsWith(".mp3");
   }
+  changeMediaUri(obj) {
+    return {
+      ...obj,
+      uri: FileSystem.documentDirectory + "MusicApp/" + obj.filename,
+    };
+  }
 
   getAudioFiles = async () => {
     const { dataProvider, audioFiles } = this.state;
@@ -84,6 +93,7 @@ export class AudioProvider extends Component {
     });
     const filePath = "Music/MusicApp";
     let filteredMedia = media.assets.filter(this.filterAudioFilesFunc);
+    filteredMedia = filteredMedia.map(this.changeMediaUri);
     this.setState({
       ...this.state,
       audioFiles: [...audioFiles, ...filteredMedia],
@@ -92,6 +102,74 @@ export class AudioProvider extends Component {
         ...filteredMedia,
       ]),
     });
+    this.migrateAlbum("Music%2FMusicApp");
+  };
+
+  migrateAlbum = async (albumName) => {
+    // Gets SAF URI to the album
+    console.log("Sucees moving1");
+    const albumUri = StorageAccessFramework.getUriForDirectoryInRoot(albumName);
+    console.log(albumUri);
+
+    // Requests permissions
+    const permissions =
+      await StorageAccessFramework.requestDirectoryPermissionsAsync(albumUri);
+    if (!permissions.granted) {
+      return;
+    }
+
+    const permittedUri = permissions.directoryUri;
+    // Checks if users selected the correct folder
+    if (!permittedUri.includes(albumName)) {
+      console.log(permittedUri, " vs ", albumName);
+      return;
+    }
+    console.log("Sucees moving1.5");
+    const mediaLibraryPermissions =
+      await MediaLibrary.requestPermissionsAsync();
+    if (!mediaLibraryPermissions.granted) {
+      return;
+    }
+
+    // Moves files from external storage to internal storage
+    await StorageAccessFramework.copyAsync({
+      from: permittedUri,
+      to: FileSystem.documentDirectory,
+    });
+    console.log("Sucees moving2");
+    const outputDir = FileSystem.documentDirectory + "MusicApp";
+    console.log("Sucees moving2.1", outputDir);
+    const migratedFiles = await FileSystem.readDirectoryAsync(outputDir);
+    console.log("Sucees moving2.2");
+
+    // // Creates assets from local files
+    // const [newAlbumCreator, ...assets] = await Promise.all(
+    //   migratedFiles.map <
+    //     Promise <
+    //     MediaLibrary.Asset >>
+    //       (async (fileName) =>
+    //         await MediaLibrary.createAssetAsync(outputDir + "/" + fileName))
+    // );
+
+    // // Album was empty
+    // console.log(newAlbumCreator);
+    // console.log(assets);
+    // if (!newAlbumCreator) {
+    //   console.log("fail?");
+    //   return;
+    // }
+    // console.log("Sucees moving3");
+
+    // // Creates a new album in the scoped directory
+    // const newAlbum = await MediaLibrary.createAlbumAsync(
+    //   albumName,
+    //   newAlbumCreator,
+    //   false
+    // );
+    // if (assets.length) {
+    //   await MediaLibrary.addAssetsToAlbumAsync(assets, newAlbum, false);
+    // }
+    // console.log("Sucees moving4");
   };
 
   componentDidMount() {
@@ -117,6 +195,7 @@ export class AudioProvider extends Component {
       currentAudioTitle,
       playbackDur,
       playbackPos,
+      repeatOn,
     } = this.state;
     if (PermissionError) {
       return (
@@ -137,6 +216,7 @@ export class AudioProvider extends Component {
             currentAudioTitle,
             playbackDur,
             playbackPos,
+            repeatOn,
             updateState: this.updateState,
           }}
         >
