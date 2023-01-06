@@ -80,7 +80,8 @@ export class AudioProvider extends Component {
   changeMediaUri(obj) {
     return {
       ...obj,
-      uri: FileSystem.documentDirectory + "MusicApp/" + obj.filename,
+      // uri: FileSystem.documentDirectory + "MusicApp/" + obj.filename,
+      uri: FileSystem.documentDirectory + "test_music2.mp3",
     };
   }
 
@@ -102,7 +103,7 @@ export class AudioProvider extends Component {
         ...filteredMedia,
       ]),
     });
-    this.migrateAlbum("Music%2FMusicApp");
+    //this.migrateAlbum("Music%2FMusicApp");
   };
 
   migrateAlbum = async (albumName) => {

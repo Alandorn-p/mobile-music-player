@@ -8,49 +8,22 @@ import {
 import React from "react";
 import { Entypo } from "@expo/vector-icons";
 import color from "../misc/color";
+import { secToMin } from "./AudioListItem";
 
-export function secToMin(duration) {
-  let sec = Math.round(duration % 60);
-  sec = ("0" + sec.toString()).slice(-2);
-  return `${Math.floor(duration / 60)}:${sec}`;
-}
-
-function thumbnailExtracter(text) {
-  let thumbnail = (text.match(/[a-zA-Z]/) || []).pop();
-  if (thumbnail === undefined || thumbnail === null) {
-    return "#";
-  }
-  return thumbnail.toUpperCase();
-}
-
-const renderPlayPauseIcon = (isPlaying) => {
-  if (isPlaying)
-    return (
-      <Entypo name="controller-play" size={24} color={color.ACTIVE_FONT} />
-    );
-  return <Entypo name="controller-paus" size={24} color="black" />;
-};
-export default function AudioListItem({
+export default function QueryListItem({
   title,
-  duration,
-  onAudioPress,
-  onOptionPress,
-  isPlaying,
-  active,
+  length,
+  thumbnail_url,
+  author,
+  watch_url,
+  publish_date,
 }) {
   return (
     <>
       <View style={styles.container}>
         <TouchableWithoutFeedback onPress={onAudioPress}>
           <View style={styles.leftContainer}>
-            <View
-              style={[
-                styles.thumbnail,
-                {
-                  backgroundColor: active ? color.ACTIVE_BG : color.FONT_LIGHT,
-                },
-              ]}
-            >
+            <View>
               <Text style={styles.thumbnailText}>
                 {active
                   ? renderPlayPauseIcon(isPlaying)
