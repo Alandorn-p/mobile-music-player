@@ -8,6 +8,8 @@ import {
   Text,
   Dimensions,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import color from "../misc/color";
 import { Entypo } from "@expo/vector-icons";
@@ -16,8 +18,11 @@ import axios from "axios";
 
 const SearchBar = ({ onPress }) => {
   //onPress is a 1 argument function, where the argument is the current text
-  const [text, onChangeText] = useState(null);
-
+  const [text, onChangeText] = useState("");
+  const pressedSearch = () => {
+    onPress(text);
+    Keyboard.dismiss();
+  };
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
@@ -27,11 +32,19 @@ const SearchBar = ({ onPress }) => {
           value={text}
           placeholder="Enter Song search or URL"
         />
+        {text && (
+          <TouchableWithoutFeedback onPress={() => onChangeText("")}>
+            <View style={{ justifyContent: "center", padding: 5 }}>
+              <Entypo
+                name="circle-with-cross"
+                size={barHeight * 0.6}
+                color="black"
+              />
+            </View>
+          </TouchableWithoutFeedback>
+        )}
       </View>
-      <TouchableOpacity
-        style={styles.rightContainer}
-        onPress={() => onPress(text)}
-      >
+      <TouchableOpacity style={styles.rightContainer} onPress={pressedSearch}>
         <Feather name="search" size={barHeight} color="black" />
       </TouchableOpacity>
     </View>
@@ -60,6 +73,7 @@ const barHeight = 40;
 const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
+    flexDirection: "row",
     borderWidth: 1,
   },
   input: {

@@ -24,6 +24,7 @@
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
     "react-native-blob-courier": "^3.1.0",
+    "react-native-filenamify": "^4.1.0",
     "react-native-fs": "^2.20.0",
     "recyclerlistview": "^4.1.3"
   },

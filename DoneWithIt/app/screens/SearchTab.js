@@ -13,14 +13,20 @@ import axios, { AxiosError } from "axios";
 import BlobCourier from "react-native-blob-courier";
 import * as MediaLibrary from "expo-media-library";
 import SearchBar from "../components/SearchBar";
+import QueryList from "../components/QueryList";
+import filenamify from "react-native-filenamify";
 // const { StorageAccessFramework } = FileSystem;
 // import * as Permissions from "expo-permissions";
 
 const SearchTab = () => {
-  const baseUrl = (x) => "http://172.20.10.21:8000/" + x;
+  //Change here if domain changes
+  const domainName = "http://172.20.10.21:8000/";
+  const baseUrl = (x) => domainName + x;
   const searchUrl = (x) => baseUrl(`search/${encodeURIComponent(x)}`);
   const testUrl = baseUrl("test/");
   const [fetching, setFetch] = useState(false);
+  const [results, setResults] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(null);
   const timeoutDuration = 15000;
 
   const onPress2 = async () => {
@@ -86,11 +92,21 @@ const SearchTab = () => {
   };
 
   const postRequest = async (text) => {
-    const response = await axios.post(baseUrl("download/"), { url: text });
-    console.log(response.data);
+    console.log("pressed fetch");
+    console.log("sent request for " + text);
+    const postResponse = await axios.post(baseUrl("download/"), { url: text });
+    const { url, title } = postResponse.data;
+    const outputPath = await FileSystem.downloadAsync(
+      baseUrl(url),
+      FileSystem.documentDirectory + `${filenamify(title)}.mp3`
+    );
+    console.log(outputPath);
   };
   const onPress = async (text) => {
+    console.log(results);
     if (!text) return;
+    if (text === searchTerm) return;
+    if (fetching) return;
     console.log("pressed");
     if (detectLink(text)) return postRequest(text);
     // If it is a url, then do a post request
@@ -99,7 +115,12 @@ const SearchTab = () => {
       const response = await axios.get(searchUrl(text), {
         timeout: timeoutDuration,
       });
-      console.log(response.data);
+      console.log(response.data.results);
+      console.log("that was results");
+      setResults(response.data.results);
+      setSearchTerm(response.data.search_term);
+      console.log("RESULTS IN SEARCH TAB", results);
+      console.log(results);
     } catch (err) {
       if (err instanceof AxiosError) {
         console.log("timeout");
@@ -109,13 +130,22 @@ const SearchTab = () => {
         throw err;
       }
     }
+    console.log("here done");
     setFetch(false);
+    console.log(fetching);
   };
 
   return (
     <>
       <SearchBar onPress={onPress} />
       {fetching && <ActivityIndicator size="large" />}
+      {results && (
+        <QueryList
+          onPress={postRequest}
+          data={results}
+          searchTerm={searchTerm}
+        />
+      )}
     </>
     // <View style={styles.container}>
 
