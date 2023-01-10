@@ -16,11 +16,11 @@ import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
 
-const SearchBar = ({ onPress }) => {
+const SearchBar = ({ searchHandler }) => {
   //onPress is a 1 argument function, where the argument is the current text
   const [text, onChangeText] = useState("");
   const pressedSearch = () => {
-    onPress(text);
+    searchHandler(text);
     Keyboard.dismiss();
   };
   return (

@@ -81,7 +81,9 @@ export class AudioProvider extends Component {
     return {
       ...obj,
       // uri: FileSystem.documentDirectory + "MusicApp/" + obj.filename,
-      uri: FileSystem.documentDirectory + "Live%20%26%20Learn%20%5BLive%5D.mp3",
+      uri:
+        FileSystem.documentDirectory +
+        "temp/%E3%82%84%E3%81%AA%E3%81%8E%E3%81%AA%E3%81%8E%20-%20%E4%B8%89%E3%81%A4%E8%91%89%E3%81%AE%E7%B5%90%E3%81%B3%E3%82%81%20(Audio).mp3",
     };
   }
 
