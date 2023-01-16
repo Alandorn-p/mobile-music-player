@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -16,22 +16,20 @@ import * as MediaLibrary from "expo-media-library";
 import SearchBar from "../components/SearchBar";
 import QueryList from "../components/QueryList";
 import filenamify from "react-native-filenamify";
-import {
-  ALERT_TYPE,
-  Dialog,
-  AlertNotificationRoot,
-  Toast,
-} from "react-native-alert-notification";
 import { Cache } from "react-native-cache";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { QueueContext } from "../context/NotificationBanner";
+import { domainName, musicPath } from "../misc/constants";
+import { AudioContext } from "../context/AudioProvider";
+import { clearAll, clearAllStorage } from "../components/Storage";
 
 // const { StorageAccessFramework } = FileSystem;
 // import * as Permissions from "expo-permissions";
 
 const SearchTab = () => {
-  //Change here if domain changes
-  const notificationTimer = 3000;
-  const domainName = "http://172.20.10.21:8000/";
+  // 1 argument function to push downloaded object to notify
+  const pushToQueue = useContext(QueueContext);
+  const audioContext = useContext(AudioContext);
   const baseUrl = (x) => domainName + x;
   const searchUrl = (x) => baseUrl(`search/${encodeURIComponent(x)}`);
   const testUrl = baseUrl("test/");
@@ -40,9 +38,7 @@ const SearchTab = () => {
   const [searchTerm, setSearchTerm] = useState(null);
   // const [finishedItem, setfinishedItem] = useState(null);
   const timeoutDuration = 15000;
-  // const queue = new Queue();
-  // const [counter, setCounter] = useState(0);
-  const [notificationQueue, setNotificationQueue] = useState([]);
+
   const cache = new Cache({
     namespace: "myapp",
     policy: {
@@ -52,29 +48,12 @@ const SearchTab = () => {
     backend: AsyncStorage,
   });
 
-  const bannerShow = (val) => {
-    Toast.show({
-      type: ALERT_TYPE.SUCCESS,
-      title: "Success",
-      textBody: val + " successfully downloaded",
-      onHide: () => {
-        setTimeout(() => setNotificationQueue((prev) => prev.slice(1)), 500);
-      },
-    });
-  };
-  const pushToQueue = (val) => setNotificationQueue((prev) => [...prev, val]);
-
   // useEffect(
   //   () => setNotificationQueue((prev) => [...prev, counter]),
   //   [counter]
   // );
 
-  useEffect(() => {
-    if (notificationQueue.length === 0) return;
-    bannerShow(notificationQueue[0]);
-  }, [notificationQueue]);
-
-  //disable this block in production
+  // disable this block in production
   useEffect(() => {
     const clearCache = async () => {
       await cache.clearAll();
@@ -138,6 +117,33 @@ const SearchTab = () => {
   // console.log(`Files inside ${newUri}:\n\n${JSON.stringify(files)}`);
   // FileSystem.deleteAsync(`${newUri}/Polaris.mp3`, { idempotent: true });
 
+  const clearDirectory = async () => {
+    const files = await FileSystem.readDirectoryAsync(musicPath);
+    console.log("files are: ", files);
+    for (let i = 0; i < files.length; i++) {
+      await FileSystem.deleteAsync(musicPath + files[i]);
+    }
+    console.log("delete successful");
+  };
+  const showDirectory = async () => {
+    const files = await FileSystem.readDirectoryAsync(musicPath);
+    console.log("files are: ", files);
+  };
+  const generateFileNameRec = async (name, ind) => {
+    console.log(name, ind);
+    const basename = `${name} (${ind}).mp3`;
+    const fileInfo = await FileSystem.getInfoAsync(musicPath + basename);
+    if (!fileInfo.exists) return basename;
+    //else it exists
+    return await generateFileNameRec(name, ind + 1);
+  };
+  const generateFileName = async (name) => {
+    const basename = `${name}.mp3`;
+    const fileInfo = await FileSystem.getInfoAsync(musicPath + basename);
+    if (!fileInfo.exists) return basename;
+    return await generateFileNameRec(name, 1);
+  };
+
   const detectLink = (text) => {
     if (text.includes("youtu.be")) return true;
     return text.includes("youtube.com") && text.includes("/");
@@ -148,12 +154,16 @@ const SearchTab = () => {
     console.log("sent request for " + text);
     const postResponse = await axios.post(baseUrl("download/"), { url: text });
     const { url, title } = postResponse.data;
+
+    const downloadToTitle = await generateFileName(filenamify(title));
+    console.log("file name found");
     const { uri, status } = await FileSystem.downloadAsync(
       baseUrl(url),
-      FileSystem.documentDirectory + "temp/" + `${filenamify(title)}.mp3`
+      musicPath + downloadToTitle
     );
     console.log(uri);
     pushToQueue(title);
+    audioContext.getAudioFiles([downloadToTitle]);
   };
 
   const setSearchStates = (json) => {
@@ -163,19 +173,22 @@ const SearchTab = () => {
 
   const onSearchPress = async (text) => {
     // console.log(results);
+
     if (!text) return;
     if (text === searchTerm) return;
     if (fetching) return;
     console.log("pressed");
     const cachedResult = await cache.get(text.toLowerCase());
+
     if (cachedResult !== undefined) {
-      console.log("cache hit!");
+      // console.log("cache hit!");
       //found in cache, no need to search
       setSearchStates(JSON.parse(cachedResult));
+
       return;
     }
 
-    console.log("cache is ", cachedResult);
+    // console.log("cache is ", cachedResult);
     if (detectLink(text)) return postRequest(text);
     // If it is a url, then do a post request
     setFetch(true);
@@ -203,28 +216,23 @@ const SearchTab = () => {
   };
 
   return (
-    <AlertNotificationRoot>
-      <>
-        <SearchBar searchHandler={onSearchPress} />
-        {fetching && <ActivityIndicator size="large" />}
-        {results && (
-          <QueryList
-            onPress={postRequest}
-            data={results}
-            searchTerm={searchTerm}
-          />
-        )}
-        {/* <Button
-          title={"toast notification"}
-          onPress={async () => {
-            await FileSystem.makeDirectoryAsync(
-              FileSystem.documentDirectory + "temp/",
-              { intermediates: true }
-            );
-          }}
-        /> */}
-      </>
-    </AlertNotificationRoot>
+    <>
+      <SearchBar searchHandler={onSearchPress} />
+      {fetching && <ActivityIndicator size="large" />}
+      {results && (
+        <QueryList
+          onPress={postRequest}
+          data={results}
+          searchTerm={searchTerm}
+        />
+      )}
+      <Button
+        title={"toast notification"}
+        onPress={audioContext.migrateAlbum}
+        // onPress={showDirectory}
+      />
+    </>
+
     // <View style={styles.container}>
 
     // {/* <Text>Search Tab</Text>

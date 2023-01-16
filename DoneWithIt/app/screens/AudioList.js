@@ -29,7 +29,7 @@ export class AudioList extends Component {
   }
 
   randomListGen = (len) => {
-    alist = Array.from(Array(len).keys());
+    const alist = Array.from(Array(len).keys());
     for (let i = alist.length - 1; i > 0; i--) {
       let j = Math.floor(Math.random() * (i + 1));
       let temp = alist[i];
@@ -138,7 +138,8 @@ export class AudioList extends Component {
     if (
       soundObj.isLoaded &&
       soundObj.isPlaying &&
-      currentAudio.id === audio.id
+      //CHANGED TO COMPARE URI
+      currentAudio.uri === audio.uri
     ) {
       console.log("already playing");
       //audio is already playing
@@ -151,7 +152,7 @@ export class AudioList extends Component {
     if (
       soundObj.isLoaded &&
       !soundObj.isPlaying &&
-      currentAudio.id === audio.id
+      currentAudio.uri === audio.uri
     ) {
       const status = await resume(playbackObj);
       updateState(this.context, { soundObj: status, isPlaying: true });
@@ -160,7 +161,7 @@ export class AudioList extends Component {
     //play another audio
     if (
       //soundObj.isLoaded &&
-      currentAudio.id !== audio.id
+      currentAudio.uri !== audio.uri
     ) {
       this.resetRandomPlaylist(audio);
       const status = await playNext(playbackObj, audio.uri);
@@ -201,6 +202,7 @@ export class AudioList extends Component {
   );
 
   rowRenderer = (type, item, index, extendedState) => {
+    // console.log("ITEM IS: ", item);
     return (
       <AudioListItem
         title={item.filename}
@@ -219,9 +221,10 @@ export class AudioList extends Component {
   render() {
     return (
       <AudioContext.Consumer>
-        {({ dataProvider, isPlaying }) => {
+        {({ dataProvider, isPlaying, getAudioFiles }) => {
           return (
             <View style={{ flex: 1 }}>
+              <Button title="hi" onPress={getAudioFiles} />
               <RecyclerListView
                 dataProvider={dataProvider}
                 layoutProvider={this.layoutProvider}

@@ -1,39 +1,34 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableWithoutFeedback,
-  SafeAreaView,
-  Alert,
-  Button,
-  Platform,
-  StatusBar,
-} from "react-native";
-
 import { NavigationContainer } from "@react-navigation/native";
 import AppNavigation from "./app/navigation/AppNavigation";
 import AudioProvider from "./app/context/AudioProvider";
-import AudioListItem from "./app/components/AudioListItem";
+// import AudioListItem from "./app/components/AudioListItem";
+
+import { View, Text } from "react-native";
+
+import NotificationBanner from "./app/context/NotificationBanner";
+
+import TestDownload from "./app/components/TestDownload";
+import filenamify from "react-native-filenamify";
 
 export default function App() {
   return (
+    // <>
+    //   <View style={{ flex: 1 }}>
+    //     <TestDownload />
+    //   </View>
+    //   <Text fontsize={200}>
+    //     {filenamify(
+    //       "Otonari no Tenshi-sama ED / Ending Full 『Chiisana Koi no Uta』 by" +
+    //         "Manaka Iwami"
+    //     )}
+    //   </Text>
+    // </>
     <AudioProvider>
-      <NavigationContainer>
-        <AppNavigation />
-      </NavigationContainer>
+      <NotificationBanner>
+        <NavigationContainer>
+          <AppNavigation />
+        </NavigationContainer>
+      </NotificationBanner>
     </AudioProvider>
   );
 }
-
-const containerStyle = { backgroundColor: "orange" };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    //paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-  },
-});

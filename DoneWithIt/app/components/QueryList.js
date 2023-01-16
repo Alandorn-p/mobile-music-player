@@ -62,8 +62,10 @@ function QueryListItem({
                   </Text>
                 </View>
                 <View style={styles.descripView}>
-                  <Text style={styles.timeText}>{author}</Text>
-                  <Text style={styles.timeText}>
+                  <Text numberOfLines={1} style={styles.timeText}>
+                    {author}
+                  </Text>
+                  <Text numberOfLines={1} style={styles.timeText}>
                     {secToMin(length) + "   " + publish_date}
                   </Text>
                 </View>
