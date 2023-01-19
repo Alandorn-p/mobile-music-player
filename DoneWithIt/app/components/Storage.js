@@ -3,7 +3,14 @@ import { all } from "axios";
 
 const songTag = "@Song:";
 const playlistTag = "@Playlist:";
+const pathTag = "@Path";
 
+export const addMusicPath = async (path) => {
+  await AsyncStorage.setItem(pathTag, path);
+};
+export const getMusicPath = async () => {
+  return await AsyncStorage.getItem(pathTag);
+};
 export const addSong = async (filename, val) => {
   await AsyncStorage.setItem(songTag + filename, val);
 };
@@ -11,7 +18,10 @@ export const addSong = async (filename, val) => {
 export const clearAllStorage = async () => {
   const keys = await AsyncStorage.getAllKeys();
   const filteredKeys = keys.filter(
-    (val) => val.startsWith(songTag) || val.startsWith(playlistTag)
+    (val) =>
+      val.startsWith(songTag) ||
+      val.startsWith(playlistTag) ||
+      val.startsWith(pathTag)
   );
   await AsyncStorage.multiRemove(filteredKeys);
   console.log("cleared all");

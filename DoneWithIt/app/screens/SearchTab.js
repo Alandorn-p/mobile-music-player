@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useReducer, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -36,6 +36,9 @@ const SearchTab = () => {
   const [fetching, setFetch] = useState(false);
   const [results, setResults] = useState(null);
   const [searchTerm, setSearchTerm] = useState(null);
+  const musicPath = FileSystem.cacheDirectory;
+  const fileCounter = useRef(0);
+
   // const [finishedItem, setfinishedItem] = useState(null);
   const timeoutDuration = 15000;
 
@@ -137,11 +140,13 @@ const SearchTab = () => {
     //else it exists
     return await generateFileNameRec(name, ind + 1);
   };
-  const generateFileName = async (name) => {
-    const basename = `${name}.mp3`;
-    const fileInfo = await FileSystem.getInfoAsync(musicPath + basename);
-    if (!fileInfo.exists) return basename;
-    return await generateFileNameRec(name, 1);
+  const generateFileName = () => {
+    // const basename = `${name}.mp3`;
+    // const fileInfo = await FileSystem.getInfoAsync(musicPath + basename);
+    // if (!fileInfo.exists) return basename;
+    // return await generateFileNameRec(name, 1);
+    fileCounter.current += 1;
+    return `temp${fileCounter.current}.mp3`;
   };
 
   const detectLink = (text) => {
@@ -152,18 +157,32 @@ const SearchTab = () => {
   const postRequest = async (text) => {
     console.log("pressed fetch");
     console.log("sent request for " + text);
-    const postResponse = await axios.post(baseUrl("download/"), { url: text });
-    const { url, title } = postResponse.data;
+    let postResponse;
+    try {
+      console.log("send post");
+      postResponse = await axios.post(
+        baseUrl("download/"),
+        { url: text },
+        { timeout: timeoutDuration }
+      );
+    } catch (err) {
+      console.log("post error");
+      if (err instanceof AxiosError) {
+        console.log("timeout");
+        return;
+      }
+    }
+    console.log("post received");
+    const { url, title, duration } = postResponse.data;
+    const downloadToTitle = generateFileName();
 
-    const downloadToTitle = await generateFileName(filenamify(title));
-    console.log("file name found");
     const { uri, status } = await FileSystem.downloadAsync(
       baseUrl(url),
       musicPath + downloadToTitle
     );
     console.log(uri);
+    await audioContext.downloadFile(title, uri, duration);
     pushToQueue(title);
-    audioContext.getAudioFiles([downloadToTitle]);
   };
 
   const setSearchStates = (json) => {
@@ -228,7 +247,7 @@ const SearchTab = () => {
       )}
       <Button
         title={"toast notification"}
-        onPress={audioContext.migrateAlbum}
+        onPress={clearAllStorage}
         // onPress={showDirectory}
       />
     </>

@@ -4,9 +4,17 @@ import * as MediaLibrary from "expo-media-library";
 import { DataProvider } from "recyclerlistview";
 import * as FileSystem from "expo-file-system";
 import { Audio } from "expo-av";
-import { addSong, getAllSongs, getSong } from "../components/Storage";
+import {
+  addMusicPath,
+  addSong,
+  clearAllStorage,
+  getAllSongs,
+  getMusicPath,
+  getSong,
+} from "../components/Storage";
 import { musicPath } from "../misc/constants";
 import { EncodingType, StorageAccessFramework } from "expo-file-system";
+import { play } from "../misc/audioPlayer";
 
 // const { requestDirectoryPermissionsAsync } = FileSystem;
 
@@ -32,7 +40,6 @@ export class AudioProvider extends Component {
     };
     this.totalAudioCount = 0;
   }
-  filePath = FileSystem.documentDirectory + "music/";
 
   permissionAlert = () => {
     Alert.alert("Permission required", "Please say yes", [
@@ -40,8 +47,47 @@ export class AudioProvider extends Component {
       { text: "cancel", onPress: () => this.permissionAlert() },
     ]);
   };
-
+  getFileName = (uri) => {
+    return decodeURIComponent(uri.substring(uri.lastIndexOf("%2F") + 3));
+  };
+  requestPermissionGetSongsAsync = async () => {
+    // request permission and gets mp3 files
+    const permObj =
+      await StorageAccessFramework.requestDirectoryPermissionsAsync("MusicApp");
+    const uri = permObj.directoryUri;
+    //add to cahce
+    await addMusicPath(uri);
+    return await StorageAccessFramework.readDirectoryAsync(uri);
+  };
   getPermission = async () => {
+    // const perm = await MediaLibrary.getPermissionsAsync(false);
+    // const uri = StorageAccessFramework.getUriForDirectoryInRoot("MusicApp");
+    //await clearAllStorage();
+    const uriCached = await getMusicPath();
+    let files;
+    if (uriCached) {
+      //cached path, try to read
+      try {
+        files = await StorageAccessFramework.readDirectoryAsync(uriCached);
+      } catch (e) {
+        //no permission, so ask
+        files = await this.requestPermissionGetSongsAsync();
+      }
+    } else {
+      // no cache path, ask for files
+      files = await this.requestPermissionGetSongsAsync();
+    }
+    // console.log("Files are", files);
+    files = files.filter((val) => val.endsWith(".mp3"));
+    return this.getAudioFiles(files);
+
+    // const uri = (
+    //   await StorageAccessFramework.requestDirectoryPermissionsAsync()
+    // ).directoryUri;
+    // await addMusicPath(uri);
+
+    // const uriCached = await getMusicPfath();
+
     //Make directory if not exist
     const dirInfo = await FileSystem.getInfoAsync(this.filePath);
     if (!dirInfo.exists) {
@@ -98,55 +144,57 @@ export class AudioProvider extends Component {
   addToDownloadQueue = (item) => {
     return;
   };
-  makeAudioObject = async (filename) => {
-    console.log("making new entry for: ", filename);
-    if (!filename.includes(".mp3")) {
-      return { uri: "random", filename: "random", duration: 0 };
-    }
+  makeAudioObject = async (uri, playbackObj) => {
+    let filename = this.getFileName(uri);
+    //file names stored as encoding
+    // console.log("making new entry for: ", filename);
     // If not found in cache
     //makes audio object (with keys duration, filename, and uri)
-    const uri = this.filePath + filename;
-    const sound = await Audio.Sound.createAsync({
-      uri,
-    });
+    const status = await playbackObj.loadAsync({ uri });
+    // console.log("Status is", status);
+    // console.log(Object.keys(sound));
+    // const { sound, status } = await Audio.Sound.createAsync({
+    //   uri,
+    // });
     const obj = {
       uri,
       filename,
-      duration: sound.status.durationMillis / 1000,
+      duration: status.durationMillis / 1000,
     };
     await addSong(filename, JSON.stringify(obj));
-
+    await playbackObj.unloadAsync();
     return obj;
   };
-  getAudioData = async (filename) => {
+  getAudioData = async (uri, playbackObj) => {
+    const filename = this.getFileName(uri);
     //find in cache
     const result = await getSong(filename);
     if (result !== null) return JSON.parse(result);
-    return await this.makeAudioObject(filename);
+    return await this.makeAudioObject(uri, playbackObj);
   };
 
   getAudioFiles = async (arr) => {
-    console.log("arr is: ", arr);
-    //arr is array of filenames OR NULL
-    // const media = await MediaLibrary.getAssetsAsync({
-    //   mediaType: "audio",
-    //   first: 500,
-    // });
-    // let filteredMedia = media.assets.filter(this.filterAudioFilesFunc);
-    // filteredMedia = filteredMedia.map(this.changeMediaUri);
+    //arr is a array of Absolute uris to music files to load
+    // console.log("arr is: ", arr);
     const { dataProvider, audioFiles } = this.state;
-    if (arr === null) {
-      const allFiles = await FileSystem.readDirectoryAsync(this.filePath);
-      //only add files that arent already in audioFiles
-      arr = allFiles.filter((val) => !this.state.audioFiles.includes(val));
+    // if (arr === null) {
+    //   const allFiles = await FileSystem.readDirectoryAsync(this.filePath);
+    //   //only add files that arent already in audioFiles
+    //   arr = allFiles.filter((val) => !this.state.audioFiles.includes(val));
+    // }
+    // create playback Obj
+    const playbackObj = new Audio.Sound();
+    for (let i = 0; i < arr.length; i++) {
+      console.log(`${i + 1}/${arr.length}`);
+      await this.getAudioData(arr[i], playbackObj);
     }
-
     const audioList = await Promise.all(arr.map(this.getAudioData));
 
     this.setState({
       ...this.state,
       audioFiles: [...audioFiles, ...audioList],
       dataProvider: dataProvider.cloneWithRows([...audioFiles, ...audioList]),
+      playbackObj,
     });
     //this.migrateAlbum("Music%2FMusicApp");
   };
@@ -170,10 +218,21 @@ export class AudioProvider extends Component {
     const fileInfo = await FileSystem.getInfoAsync(musicPath + "/" + filename);
     console.log(fileInfo.isDirectory);
   };
-  downloadFile = async (filename, inputFileUri, outputDir) => {
+  addToAudioList = async (filename, uri, duration) => {
+    const { dataProvider, audioFiles } = this.state;
+    const obj = { filename, uri, duration };
+    this.setState({
+      ...this.state,
+      audioFiles: [...audioFiles, obj],
+      dataProvider: dataProvider.cloneWithRows([...audioFiles, obj]),
+    });
+    await addSong(filename, JSON.stringify(obj));
+  };
+  downloadFile = async (filename, inputFileUri, duration) => {
     if (filename.endsWith(".mp3")) {
       filename = filename.slice(0, filename.length - 4);
     }
+    const outputDir = await getMusicPath();
     const outputPath = await StorageAccessFramework.createFileAsync(
       outputDir,
       filename,
@@ -190,8 +249,7 @@ export class AudioProvider extends Component {
         encoding: EncodingType.Base64,
       }
     );
-
-    return;
+    await this.addToAudioList(filename, outputPath, duration);
   };
 
   migrateAlbum = async () => {
@@ -259,6 +317,7 @@ export class AudioProvider extends Component {
 
   componentDidMount() {
     // this.waitRequest();
+
     this.getPermission();
   }
   printChild() {
@@ -305,7 +364,7 @@ export class AudioProvider extends Component {
             repeatOn,
             updateState: this.updateState,
             getAudioFiles: this.getAudioFiles,
-            migrateAlbum: this.migrateAlbum,
+            downloadFile: this.downloadFile,
           }}
         >
           {this.props.children}
