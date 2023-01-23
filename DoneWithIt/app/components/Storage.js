@@ -1,9 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { all } from "axios";
 
 const songTag = "@Song:";
 const playlistTag = "@Playlist:";
-const pathTag = "@Path";
+const pathTag = "@Path:";
 
 export const addMusicPath = async (path) => {
   await AsyncStorage.setItem(pathTag, path);
@@ -52,8 +51,30 @@ export const getPlaylist = async (playlistName) => {
   return await AsyncStorage.getItem(playlistTag + playlistName);
 };
 // may modify for more
-export const addPlaylist = async (playlistName, val) => {
-  await AsyncStorage.setItem(playlistTag + playlistName, val);
+export const newPlaylist = async (playlistName) => {
+  const obj = { name: playlistName, contents: [] };
+  await AsyncStorage.setItem(playlistTag + playlistName, JSON.stringify(obj));
+};
+
+export const addToPlaylist = async (playlistName, val) => {
+  const playlistStr = await AsyncStorage.getItem(playlistTag + playlistName);
+  const { name, contents } = JSON.parse(playlistStr);
+  const newObj = { name, contents: [...contents, val] };
+  await AsyncStorage.setItem(
+    playlistTag + playlistName,
+    JSON.stringify(newObj)
+  );
+};
+
+export const removeFromPlaylist = async (playlistName, val) => {
+  const playlistStr = await AsyncStorage.getItem(playlistTag + playlistName);
+  const { name, contents } = JSON.parse(playlistStr);
+  const newContents = contents.filter((x) => x != val);
+  const newObj = { name, contents: newContents };
+  await AsyncStorage.setItem(
+    playlistTag + playlistName,
+    JSON.stringify(newObj)
+  );
 };
 
 export const delPlaylist = async (playlistName) => {
