@@ -224,7 +224,7 @@ export class AudioList extends Component {
         {({ dataProvider, isPlaying, getAudioFiles }) => {
           return (
             <View style={{ flex: 1 }}>
-              <Button title="hi" onPress={getAudioFiles} />
+              {/* <Button title="hi" onPress={getAudioFiles} /> */}
               <RecyclerListView
                 dataProvider={dataProvider}
                 layoutProvider={this.layoutProvider}

@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import AppNavigation from "./app/navigation/AppNavigation";
 import AudioProvider from "./app/context/AudioProvider";
-// import AudioListItem from "./app/components/AudioListItem";
+import AudioListItem from "./app/components/AudioListItem";
 
 import { View, Text } from "react-native";
 

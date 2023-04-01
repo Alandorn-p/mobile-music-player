@@ -8,6 +8,7 @@ import SearchTab from "../screens/SearchTab";
 const Tab = createBottomTabNavigator();
 function AppNavigation(props) {
   return (
+    // <Text>hi</Text>
     <Tab.Navigator>
       <Tab.Screen name="AudioList" component={AudioList} />
       <Tab.Screen name="Player" component={Player} />

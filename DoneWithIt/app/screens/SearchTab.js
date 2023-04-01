@@ -245,11 +245,6 @@ const SearchTab = () => {
           searchTerm={searchTerm}
         />
       )}
-      <Button
-        title={"toast notification"}
-        onPress={clearAllStorage}
-        // onPress={showDirectory}
-      />
     </>
 
     // <View style={styles.container}>
