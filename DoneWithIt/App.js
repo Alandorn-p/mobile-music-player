@@ -12,17 +12,6 @@ import filenamify from "react-native-filenamify";
 
 export default function App() {
   return (
-    // <>
-    //   <View style={{ flex: 1 }}>
-    //     <TestDownload />
-    //   </View>
-    //   <Text fontsize={200}>
-    //     {filenamify(
-    //       "Otonari no Tenshi-sama ED / Ending Full 『Chiisana Koi no Uta』 by" +
-    //         "Manaka Iwami"
-    //     )}
-    //   </Text>
-    // </>
     <AudioProvider>
       <NotificationBanner>
         <NavigationContainer>
