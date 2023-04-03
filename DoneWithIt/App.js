@@ -13,7 +13,16 @@ import filenamify from "react-native-filenamify";
 
 export default function App() {
   try {
-    return <TestText></TestText>;
+    // return <TestText></TestText>;
+    return (
+      <AudioProvider>
+        <NotificationBanner>
+          <NavigationContainer>
+            <AppNavigation />
+          </NavigationContainer>
+        </NotificationBanner>
+      </AudioProvider>
+    );
   } catch (e) {
     return (
       <View
@@ -27,14 +36,4 @@ export default function App() {
       </View>
     );
   }
-  // return (
-
-  // <AudioProvider>
-  //   <NotificationBanner>
-  //     <NavigationContainer>
-  //       <AppNavigation />
-  //     </NavigationContainer>
-  //   </NotificationBanner>
-  // </AudioProvider>
-  // );
 }
