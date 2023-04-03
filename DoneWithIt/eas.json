@@ -8,6 +8,9 @@
       "distribution": "internal",
       "ios": {
         "resourceClass": "m1-medium"
+      },
+      "android": {
+        "buildType": "apk"
       }
     },
     "preview": {
@@ -22,6 +25,9 @@
     "production": {
       "ios": {
         "resourceClass": "m1-medium"
+      },
+      "android": {
+        "buildType": "apk"
       }
     },
     "preview2": {
