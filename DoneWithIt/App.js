@@ -4,7 +4,6 @@ import {
   View,
   Image,
   TouchableWithoutFeedback,
-  SafeAreaView,
   Alert,
   Button,
   Platform,
