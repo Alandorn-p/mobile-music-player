@@ -18,6 +18,7 @@ import AudioListItem from "./app/components/AudioListItem";
 
 export default function App() {
   return (
+    // <Text>hi</Text>
     <AudioProvider>
       <NavigationContainer>
         <AppNavigation />
