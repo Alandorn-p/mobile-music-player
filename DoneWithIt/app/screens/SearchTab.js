@@ -221,6 +221,7 @@ const SearchTab = () => {
         JSON.stringify(response.data)
       );
     } catch (err) {
+      console.log(err);
       if (err instanceof AxiosError) {
         console.log("timeout");
         setFetch(false);
@@ -231,7 +232,7 @@ const SearchTab = () => {
     }
     console.log("here done");
     setFetch(false);
-    console.log(fetching);
+    // console.log(fetching);
   };
 
   return (
