@@ -86,22 +86,13 @@
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
-This is a Mobile app created using React Native. My goal was to create an app that I was happy to use everyday,
-while also learning about React/React Native and mobile app development. 
-I initially wanted to create a simple, lightweight music playing app, able to play music located on the phone's 
-storage and create custom playlists. To add music to the app, I initially had to transfer the files from my computer
-using a cable, but this was very tedious. As the project grew I decided to create a lightweight Django backend to add another major feature:
-searching and downloading audio from Youtube straight into the app, circumventing the need to connect my phone to my computer.
-
 A simple mobile app to play music.
 <br>
 I created this app with the intention of building a personal app that I would enjoy using daily, 
 while also gaining knowledge about React/React Native and mobile app development. Initially, my aim was to develop a 
 simple music player app capable of playing local music files and creating custom playlists. However, the
 process of transferring music files from my computer to the app using a cable proved to be tedious. 
-As the project progressed, I integrated a lightweight Django backend ([link here](https://github.com/Alandorn-p/music_backend.git)), which allowed me to incorporate the ability to search and download audio directly from YouTube, eliminating the need to connect my phone to the computer.
-
-
+Thus I created and integrated my lightweight Django backend ([link here](https://github.com/Alandorn-p/music_backend.git)), which allowed me to incorporate the ability to search and download audio directly from YouTube, eliminating the need to connect my phone to the computer.
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -153,10 +144,11 @@ Below is a quick description of the routes supported on the server. For more det
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Replace pytube dependency (library is outdated)
-- [ ] Job to automatically clear music file cache
-- [ ] Create production environment
-- [ ] Deploy to cloud!!!
+- [ ] Create config tab
+- [ ] Finish Player and PlayList tab
+- [ ] Add custom playlist functionality
+- [ ] Configure Expo project to the new build system (EAS)
+
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -175,10 +167,7 @@ Github Link: [Alandorn-p](https://github.com/Alandorn-p)
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
-
-* []()
-* []()
-* []()
+A base functionality of this app follows the tutorial made by a Youtuber Full Stack Niraj. [Link](https://www.youtube.com/watch?v=zVUWdppGom8&list=PLaAoUJDWH9Wqatfwa4SEfyFevrl8QefcN&index=1&ab_channel=FullStackNiraj) to the tutorial playlist.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
