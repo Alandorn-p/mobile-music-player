@@ -87,7 +87,7 @@
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
 A simple mobile app to play music.
-<br>
+<br><br>
 I created this app with the intention of building a personal app that I would enjoy using daily, 
 while also gaining knowledge about React/React Native and mobile app development. Initially, my aim was to develop a 
 simple music player app capable of playing local music files and creating custom playlists. However, the
@@ -117,7 +117,9 @@ For local development:
    ```sh
    npm start
    ```
-3. Open the Expo Go app and scan the QR code
+4. Open the Expo Go app and scan the QR code
+
+5. (Optionally) If you want to also download from youtube,  ([start the backend server](https://github.com/Alandorn-p/music_backend.git))
    
 
 
@@ -126,7 +128,7 @@ For local development:
 
 
 <!-- USAGE EXAMPLES -->
-## Documentation
+## Screenshots
 
 <!-- ![My Image](images/audiolist.jpg)
 
@@ -158,8 +160,6 @@ For local development:
         <td style="text-align: center;">
             <img src="images/player.jpg" alt="" />
         </td>
-    </tr>
-    <tr>
         <td style="text-align: center;">
             <img src="images/download.jpg" alt="" />
         </td>
@@ -170,11 +170,7 @@ For local development:
 </table>
 </div>
 
-<img
-  src="images/download_finish.jpg"
-  alt="Alt text"
-  title="Optional title"
-  style="display: inline-block; margin: 0 auto; max-width: 300px">
+
 
 
 
