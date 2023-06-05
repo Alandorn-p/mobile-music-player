@@ -1,6 +1,0 @@
-Keystore credentials
-  Keystore password: fd52e1e2cfc8424fb28f435f2fffe8c5
-  Key alias:         QGFsYW5kb3JuLXAvUGxheWxpc3RBcHA=
-  Key password:      98b2a3d173b44449ab23af4821f7e346
-
-  Path to Keystore:  C:\javascript WS\mobile-music-player\DoneWithIt\PlaylistApp.jks
