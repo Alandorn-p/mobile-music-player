@@ -136,24 +136,48 @@ For local development:
 
 ![My Image](images/download_finish.jpg)
  -->
-<div class="flex-container">
-  <div class="flex-row">
-    <div class="flex-item">
-      <img src="images/audiolist.jpg" alt="Image 1">
-    </div>
-    <div class="flex-item">
-      <img src="images/player.jpg" alt="Image 1">
-    </div>
-    <div class="flex-item">
-      <img src="images/download.jpg" alt="Image 2">
-    </div>
-  </div>
-  <div class="flex-row">
-    <div class="flex-item">
-      <img src="images/download_finish.jpg" alt="Image 3">
-    </div>
-  </div>
+<!-- 
+<table>
+  <tr>
+    <td> <img src="images/audiolist.jpg"  ></td>
+    <td><img src="images/player.jpg" align="right" ></td>
+  </tr>
+  <tr>
+    <td> <img src="images/download.jpg"  ></td>
+    <td><img src="images/download_finish.jpg" ></td>
+  </tr>
+</table> -->
+
+
+<div style="width: 50%; display: flex; justify-content: center;">
+<table cellspacing="0" cellpadding="0" border="0" >
+    <tr>
+        <td style="text-align: center;">
+            <img src="images/audiolist.jpg" alt="" />
+        </td>
+        <td style="text-align: center;">
+            <img src="images/player.jpg" alt="" />
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center;">
+            <img src="images/download.jpg" alt="" />
+        </td>
+        <td style="text-align: center;">
+            <img src="images/download_finish.jpg" alt="" />
+        </td>
+    </tr>
+</table>
 </div>
+
+<img
+  src="images/download_finish.jpg"
+  alt="Alt text"
+  title="Optional title"
+  style="display: inline-block; margin: 0 auto; max-width: 300px">
+
+
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
