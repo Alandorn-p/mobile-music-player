@@ -94,14 +94,13 @@ using a cable, but this was very tedious. As the project grew I decided to creat
 searching and downloading audio from Youtube straight into the app, circumventing the need to connect my phone to my computer.
 
 A simple mobile app to play music.
-<p>
+<br>
 I created this app with the intention of building a personal app that I would enjoy using daily, 
 while also gaining knowledge about React/React Native and mobile app development. Initially, my aim was to develop a 
 simple music player app capable of playing local music files and creating custom playlists. However, the
 process of transferring music files from my computer to the app using a cable proved to be tedious. 
-As the project progressed, I integrated a lightweight Django backend ([link here](https://github.com/Alandorn-p/mobile-music-player.git)), which allowed me to incorporate a significant feature: the ability to search 
-and download audio directly from YouTube, eliminating the need to connect my phone to the computer.
-</p>
+As the project progressed, I integrated a lightweight Django backend ([link here](https://github.com/Alandorn-p/music_backend.git)), which allowed me to incorporate the ability to search and download audio directly from YouTube, eliminating the need to connect my phone to the computer.
+
 
 
 
@@ -159,6 +158,27 @@ Below is a quick description of the routes supported on the server. For more det
 - [ ] Create production environment
 - [ ] Deploy to cloud!!!
 
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+<!-- CONTACT -->
+## Contact
+
+Al Palanuwech -  ap689@cornell.edu
+
+Github Link: [Alandorn-p](https://github.com/Alandorn-p)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+* []()
+* []()
+* []()
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
