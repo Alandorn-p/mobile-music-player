@@ -127,14 +127,14 @@ For local development:
 
 <!-- USAGE EXAMPLES -->
 ## Documentation
-Below is a quick description of the routes supported on the server. For more detailed documentation with examples see the home page of the server.
 
-| Route | Description | 
-| --- | --- |
-| GET  /| Shows detailed documentation page with examples | 
-| GET  /search/{query} | Retrieves a list of videos from Youtube based on query | 
-| POST /download/ | Store a Youtube video with a given url to the database | 
-| GET /get/{id} | Retrieves a video with the specified Youtube id as an mp3 from the database (assumes video already in database) | 
+![My Image](images/audiolist.jpg)
+
+![My Image](images/player.jpg)
+
+![My Image](images/download.jpg)
+
+![My Image](images/download_finish.jpg)
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
