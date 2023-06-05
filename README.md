@@ -128,14 +128,32 @@ For local development:
 <!-- USAGE EXAMPLES -->
 ## Documentation
 
-![My Image](images/audiolist.jpg)
+<!-- ![My Image](images/audiolist.jpg)
 
 ![My Image](images/player.jpg)
 
 ![My Image](images/download.jpg)
 
 ![My Image](images/download_finish.jpg)
-
+ -->
+<div class="flex-container">
+  <div class="flex-row">
+    <div class="flex-item">
+      <img src="images/audiolist.jpg" alt="Image 1">
+    </div>
+    <div class="flex-item">
+      <img src="images/player.jpg" alt="Image 1">
+    </div>
+    <div class="flex-item">
+      <img src="images/download.jpg" alt="Image 2">
+    </div>
+  </div>
+  <div class="flex-row">
+    <div class="flex-item">
+      <img src="images/download_finish.jpg" alt="Image 3">
+    </div>
+  </div>
+</div>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
