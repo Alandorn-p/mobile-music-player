@@ -119,7 +119,7 @@ For local development:
    ```
 4. Open the Expo Go app and scan the QR code
 
-5. (Optionally) If you want to also download from youtube,  ([start the backend server](https://github.com/Alandorn-p/music_backend.git))
+5. (Optionally) If you want to also download from youtube,  [start the backend server](https://github.com/Alandorn-p/music_backend.git)
    
 
 
