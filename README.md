@@ -109,7 +109,7 @@ For local development:
    ```sh
    git clone https://github.com/Alandorn-p/mobile-music-player.git
    ```
-2. Install dependencies (TODO)
+2. Install dependencies
    ```sh
    npm install
    ```
