@@ -117,7 +117,7 @@ For local development:
    ```sh
    npm start
    ```
-4. Open the Expo Go app and scan the QR code
+4. Open the Expo Go app and scan the QR code, select 'Expo Go'
 
 5. (Optionally) If you want to also download from youtube,  [start the backend server](https://github.com/Alandorn-p/music_backend.git)
    

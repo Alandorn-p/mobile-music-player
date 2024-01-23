@@ -196,7 +196,7 @@ const SearchTab = () => {
     if (!text) return;
     if (text === searchTerm) return;
     if (fetching) return;
-    console.log("pressed");
+    console.log("presse");
     const cachedResult = await cache.get(text.toLowerCase());
 
     if (cachedResult !== undefined) {

@@ -1,4 +1,5 @@
 .expo/
+src/node_modules/*
 
 
 # macOS

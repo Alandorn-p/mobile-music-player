@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   timeText: {
     lineHeight: propToHeight(descripProportion / 2),
     fontSize: propToHeight(descripProportion / 2),
-    adjustsFontSizeToFit: true,
+    // adjustsFontSizeToFit: true,
     color: color.FONT_LIGHT,
   },
 });
