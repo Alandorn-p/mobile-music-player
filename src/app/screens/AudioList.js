@@ -1,12 +1,5 @@
-import React, { Component, useEffect } from "react";
-import {
-  Button,
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import React, { Component } from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { AudioContext } from "../context/AudioProvider";
 import { RecyclerListView, LayoutProvider } from "recyclerlistview";
 import AudioListItem from "../components/AudioListItem";
@@ -244,6 +237,7 @@ export class AudioList extends Component {
                   this.setState({
                     ...this.state,
                     repeatSong: !this.state.repeatSong,
+                    OptionModalVisible: false,
                   })
                 }
               />

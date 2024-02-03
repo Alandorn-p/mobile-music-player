@@ -1,22 +1,17 @@
-import { useState } from "react";
+import { React, useState } from "react";
 import {
-  SafeAreaView,
   StyleSheet,
   TextInput,
-  TouchableHighlight,
   View,
-  Text,
   Dimensions,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import color from "../misc/color";
 import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import axios from "axios";
 
-const SearchBar = ({ searchHandler }) => {
+const SearchBar = ({ searchHandler, placeholder }) => {
   //onPress is a 1 argument function, where the argument is the current text
   const [text, onChangeText] = useState("");
   const pressedSearch = () => {
@@ -30,7 +25,7 @@ const SearchBar = ({ searchHandler }) => {
           style={styles.input}
           onChangeText={onChangeText}
           value={text}
-          placeholder="Enter Song search or URL"
+          placeholder={placeholder}
         />
         {text && (
           <TouchableWithoutFeedback onPress={() => onChangeText("")}>
@@ -92,7 +87,6 @@ const styles = StyleSheet.create({
     // marginHorizontal: 10,
     // marginLeft: 10,
     justifyContent: "center",
-    alignItems: "center",
     //backgroundColor: "red",
   },
   rightContainer: {

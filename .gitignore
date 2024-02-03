@@ -1,2 +1,6 @@
 *.vscode
 *keystone.txt
+*node_modules*
+*.eslintrc.json
+
+src/node_modules/*

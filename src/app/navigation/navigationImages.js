@@ -1,4 +1,5 @@
 import { FontAwesome, MaterialIcons, AntDesign } from "@expo/vector-icons";
+import React from "react";
 
 export const AudioListImage = ({ color, size }) => (
   <FontAwesome name="music" size={size} color={color} />

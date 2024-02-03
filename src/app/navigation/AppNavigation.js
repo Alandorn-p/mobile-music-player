@@ -4,12 +4,14 @@ import AudioList from "../screens/AudioList";
 import Player from "../screens/Player";
 import PlayList from "../screens/PlayList";
 import SearchTab from "../screens/SearchTab";
+
 import {
   AudioListImage,
   PlayerImage,
   PlayListImage,
   DownloadImage,
 } from "./navigationImages";
+import ConfigPage from "../screens/ConfigPage";
 
 const Tab = createBottomTabNavigator();
 function AppNavigation(props) {
@@ -27,6 +29,7 @@ function AppNavigation(props) {
       <Tab.Screen {...props_maker("Player", Player, PlayerImage)} />
       <Tab.Screen {...props_maker("Playlist", PlayList, PlayListImage)} />
       <Tab.Screen {...props_maker("Download", SearchTab, DownloadImage)} />
+      <Tab.Screen {...props_maker("Config", ConfigPage, DownloadImage)} />
     </Tab.Navigator>
   );
 }

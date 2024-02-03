@@ -1,25 +1,16 @@
+import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
+import { EncodingType, StorageAccessFramework } from "expo-file-system";
 import React, { Component, createContext } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
-import * as MediaLibrary from "expo-media-library";
 import { DataProvider } from "recyclerlistview";
-import * as FileSystem from "expo-file-system";
-import { Audio } from "expo-av";
 import {
   addMusicPath,
   addSong,
-  clearAllStorage,
-  getAllSongs,
   getMusicPath,
   getSong,
 } from "../components/Storage";
-import {
-  musicPath,
-  internalStoragePath,
-  internalStoragePathTest,
-} from "../misc/constants";
-import { EncodingType, StorageAccessFramework } from "expo-file-system";
-
-import { play } from "../misc/audioPlayer";
+import { internalStoragePath, musicPath } from "../misc/constants";
 
 // const { requestDirectoryPermissionsAsync } = FileSystem;
 
@@ -142,10 +133,9 @@ export class AudioProvider extends Component {
   };
   transferFile = async (initialUri) => {
     const filename = initialUri.substring(initialUri.lastIndexOf("%2F") + 3);
-    const contents = await StorageAccessFramework.readAsStringAsync(
-      initialUri,
-      { encoding: EncodingType.Base64 }
-    );
+    await StorageAccessFramework.readAsStringAsync(initialUri, {
+      encoding: EncodingType.Base64,
+    });
     const result = await StorageAccessFramework.createFileAsync(
       musicPath,
       filename,

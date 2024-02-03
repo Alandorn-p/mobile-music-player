@@ -1,38 +1,27 @@
-import { useState, useEffect, useContext, useReducer, useRef } from "react";
-import {
-  StyleSheet,
-  Text,
-  Touchable,
-  TouchableWithoutFeedback,
-  View,
-  TextInput,
-  ActivityIndicator,
-  Button,
-} from "react-native";
+import { useState, useEffect, useContext, useRef, React } from "react";
+import { StyleSheet, ActivityIndicator } from "react-native";
 import * as FileSystem from "expo-file-system";
 import axios, { AxiosError } from "axios";
-import BlobCourier from "react-native-blob-courier";
-import * as MediaLibrary from "expo-media-library";
 import SearchBar from "../components/SearchBar";
 import QueryList from "../components/QueryList";
-import filenamify from "react-native-filenamify";
 import { Cache } from "react-native-cache";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { QueueContext } from "../context/NotificationBanner";
-import { domainName, musicPath } from "../misc/constants";
 import { AudioContext } from "../context/AudioProvider";
-import { clearAll, clearAllStorage } from "../components/Storage";
 
+import { ipContext } from "../context/configContexts";
 // const { StorageAccessFramework } = FileSystem;
 // import * as Permissions from "expo-permissions";
 
 const SearchTab = () => {
   // 1 argument function to push downloaded object to notify
+
+  const { ipAddress, port } = useContext(ipContext);
   const pushToQueue = useContext(QueueContext);
   const audioContext = useContext(AudioContext);
-  const baseUrl = (x) => domainName + x;
+  const baseUrl = (x) => `http://${ipAddress}:${port}/` + x;
   const searchUrl = (x) => baseUrl(`search/${encodeURIComponent(x)}`);
-  const testUrl = baseUrl("test/");
+  //   const testUrl = baseUrl("test/");
   const [fetching, setFetch] = useState(false);
   const [results, setResults] = useState(null);
   const [searchTerm, setSearchTerm] = useState(null);
@@ -120,26 +109,26 @@ const SearchTab = () => {
   // console.log(`Files inside ${newUri}:\n\n${JSON.stringify(files)}`);
   // FileSystem.deleteAsync(`${newUri}/Polaris.mp3`, { idempotent: true });
 
-  const clearDirectory = async () => {
-    const files = await FileSystem.readDirectoryAsync(musicPath);
-    console.log("files are: ", files);
-    for (let i = 0; i < files.length; i++) {
-      await FileSystem.deleteAsync(musicPath + files[i]);
-    }
-    console.log("delete successful");
-  };
-  const showDirectory = async () => {
-    const files = await FileSystem.readDirectoryAsync(musicPath);
-    console.log("files are: ", files);
-  };
-  const generateFileNameRec = async (name, ind) => {
-    console.log(name, ind);
-    const basename = `${name} (${ind}).mp3`;
-    const fileInfo = await FileSystem.getInfoAsync(musicPath + basename);
-    if (!fileInfo.exists) return basename;
-    //else it exists
-    return await generateFileNameRec(name, ind + 1);
-  };
+  //   const clearDirectory = async () => {
+  //     const files = await FileSystem.readDirectoryAsync(musicPath);
+  //     console.log("files are: ", files);
+  //     for (let i = 0; i < files.length; i++) {
+  //       await FileSystem.deleteAsync(musicPath + files[i]);
+  //     }
+  //     console.log("delete successful");
+  //   };
+  //   const showDirectory = async () => {
+  //     const files = await FileSystem.readDirectoryAsync(musicPath);
+  //     console.log("files are: ", files);
+  //   };
+  //   const generateFileNameRec = async (name, ind) => {
+  //     console.log(name, ind);
+  //     const basename = `${name} (${ind}).mp3`;
+  //     const fileInfo = await FileSystem.getInfoAsync(musicPath + basename);
+  //     if (!fileInfo.exists) return basename;
+  //     //else it exists
+  //     return await generateFileNameRec(name, ind + 1);
+  //   };
   const generateFileName = () => {
     // const basename = `${name}.mp3`;
     // const fileInfo = await FileSystem.getInfoAsync(musicPath + basename);
@@ -176,7 +165,7 @@ const SearchTab = () => {
     const { url, title, duration } = postResponse.data;
     const downloadToTitle = generateFileName();
 
-    const { uri, status } = await FileSystem.downloadAsync(
+    const { uri } = await FileSystem.downloadAsync(
       baseUrl(url),
       musicPath + downloadToTitle
     );
@@ -192,11 +181,10 @@ const SearchTab = () => {
 
   const onSearchPress = async (text) => {
     // console.log(results);
-
     if (!text) return;
     if (text === searchTerm) return;
     if (fetching) return;
-    console.log("presse");
+    console.log("presses");
     const cachedResult = await cache.get(text.toLowerCase());
 
     if (cachedResult !== undefined) {
@@ -237,7 +225,10 @@ const SearchTab = () => {
 
   return (
     <>
-      <SearchBar searchHandler={onSearchPress} />
+      <SearchBar
+        searchHandler={onSearchPress}
+        placeholder={"Enter Song search or URL"}
+      />
       {fetching && <ActivityIndicator size="large" />}
       {results && (
         <QueryList

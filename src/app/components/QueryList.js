@@ -1,20 +1,19 @@
+import React, { Component, useEffect, useState } from "react";
 import {
   Dimensions,
+  Image,
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
   View,
-  Image,
 } from "react-native";
-import React, { Component, useEffect, useState } from "react";
-import { Entypo } from "@expo/vector-icons";
-import color from "../misc/color";
-import { secToMin } from "./AudioListItem";
 import {
-  RecyclerListView,
   DataProvider,
   LayoutProvider,
+  RecyclerListView,
 } from "recyclerlistview";
+import color from "../misc/color";
+import { secToMin } from "./AudioListItem";
 
 function QueryListItem({
   title,

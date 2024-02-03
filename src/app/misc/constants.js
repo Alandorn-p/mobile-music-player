@@ -8,7 +8,7 @@ export const internalStoragePathTest = "MusicAppTest";
 
 // INCLUDE ENDING /
 // check ip with 'ipconfig /all', find IPv4 Address
-export const ipAddress='192.168.1.118';
-export const portNum='8000';
 
-export const domainName = `http://${ipAddress}:${portNum}/`;
+export const defaultIpAddress = "192.168.1.161";
+export const defaultPort = "8000";
+

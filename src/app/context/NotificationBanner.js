@@ -1,5 +1,4 @@
-import { useContext, useState, createContext, useEffect } from "react";
-import { render } from "react-dom";
+import { React, createContext, useEffect, useState } from "react";
 import {
   ALERT_TYPE,
   AlertNotificationRoot,
