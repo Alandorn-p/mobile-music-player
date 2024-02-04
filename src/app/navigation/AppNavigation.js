@@ -10,6 +10,7 @@ import {
   PlayerImage,
   PlayListImage,
   DownloadImage,
+  ConfigImage,
 } from "./navigationImages";
 import ConfigPage from "../screens/ConfigPage";
 
@@ -29,7 +30,7 @@ function AppNavigation(props) {
       <Tab.Screen {...props_maker("Player", Player, PlayerImage)} />
       <Tab.Screen {...props_maker("Playlist", PlayList, PlayListImage)} />
       <Tab.Screen {...props_maker("Download", SearchTab, DownloadImage)} />
-      <Tab.Screen {...props_maker("Config", ConfigPage, DownloadImage)} />
+      <Tab.Screen {...props_maker("Config", ConfigPage, ConfigImage)} />
     </Tab.Navigator>
   );
 }

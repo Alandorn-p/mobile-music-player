@@ -1,6 +1,6 @@
 //play
 export const play = async (playbackObj, uri) => {
-  console.log("PLAYBACK IS", playbackObj);
+  //   console.log("PLAYBACK IS", playbackObj);
   try {
     const status = await playbackObj.loadAsync({ uri }, { shouldPlay: true });
     console.log();

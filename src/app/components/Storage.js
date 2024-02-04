@@ -4,6 +4,10 @@ const songTag = "@Song:";
 const playlistTag = "@Playlist:";
 const pathTag = "@Path:";
 
+
+//songs: string :> { filename, uri, duration }
+//playlist: string :> {name :string, contents : [string]}
+
 export const addMusicPath = async (path) => {
   await AsyncStorage.setItem(pathTag, path);
 };
@@ -48,28 +52,32 @@ export const clearSongs = async () => {
 };
 
 export const getPlaylist = async (playlistName) => {
-  return await AsyncStorage.getItem(playlistTag + playlistName);
+  const res= await AsyncStorage.getItem(playlistTag + playlistName);
+  return JSON.parse(res)
 };
 // may modify for more
-export const newPlaylist = async (playlistName) => {
+export const createNewPlaylist = async (playlistName) => {
   const obj = { name: playlistName, contents: [] };
   await AsyncStorage.setItem(playlistTag + playlistName, JSON.stringify(obj));
 };
 
-export const addToPlaylist = async (playlistName, val) => {
+export const addToPlaylist = async (playlistName, filename) => {
+    console.log(filename)
+    //val is string, song name
   const playlistStr = await AsyncStorage.getItem(playlistTag + playlistName);
+  console.log(playlistStr)
   const { name, contents } = JSON.parse(playlistStr);
-  const newObj = { name, contents: [...contents, val] };
+  const newObj = { name, contents: [...contents, filename] };
   await AsyncStorage.setItem(
     playlistTag + playlistName,
     JSON.stringify(newObj)
   );
 };
 
-export const removeFromPlaylist = async (playlistName, val) => {
+export const removeFromPlaylist = async (playlistName, filename) => {
   const playlistStr = await AsyncStorage.getItem(playlistTag + playlistName);
   const { name, contents } = JSON.parse(playlistStr);
-  const newContents = contents.filter((x) => x != val);
+  const newContents = contents.filter((songName) => songName != filename);
   const newObj = { name, contents: newContents };
   await AsyncStorage.setItem(
     playlistTag + playlistName,
@@ -79,4 +87,15 @@ export const removeFromPlaylist = async (playlistName, val) => {
 
 export const delPlaylist = async (playlistName) => {
   await AsyncStorage.removeItem(playlistTag + playlistName);
+};
+
+
+export const getAllPlaylists = async () => {
+  const keys = await AsyncStorage.getAllKeys();
+  const allSongs = keys.filter((val) => val.startsWith(playlistTag));
+  for (let i = 0; i < allSongs.length; i++) {
+    const obj = await AsyncStorage.getItem(allSongs[i]);
+    console.log(allSongs[i], "\nvalue: ", obj);
+  }
+  return allSongs;
 };

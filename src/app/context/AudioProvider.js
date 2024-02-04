@@ -1,4 +1,4 @@
-import { Audio } from "expo-av";
+import { Audio, InterruptionModeAndroid } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import { EncodingType, StorageAccessFramework } from "expo-file-system";
 import React, { Component, createContext } from "react";
@@ -7,10 +7,14 @@ import { DataProvider } from "recyclerlistview";
 import {
   addMusicPath,
   addSong,
+  addToPlaylist,
+  createNewPlaylist,
   getMusicPath,
+  getPlaylist,
   getSong,
 } from "../components/Storage";
 import { internalStoragePath, musicPath } from "../misc/constants";
+import { pause, play, playNext, resume } from "../misc/audioPlayer";
 
 // const { requestDirectoryPermissionsAsync } = FileSystem;
 
@@ -33,8 +37,13 @@ export class AudioProvider extends Component {
       repeatOn: false,
       getAudioFiles: null,
       downloadQueue: [],
+      curSongIndex: 0,
+      songList: [],
+      repeatSong: false,
     };
     this.totalAudioCount = 0;
+    console.log("FINISH CON");
+    console.log(this.state);
   }
 
   permissionAlert = () => {
@@ -154,6 +163,11 @@ export class AudioProvider extends Component {
     });
     await addSong(filename, JSON.stringify(obj));
   };
+
+  initPlaybackObj = () => {
+    return new Audio.Sound();
+  };
+
   downloadFile = async (filename, inputFileUri, duration) => {
     if (filename.endsWith(".mp3")) {
       filename = filename.slice(0, filename.length - 4);
@@ -181,11 +195,185 @@ export class AudioProvider extends Component {
   componentDidMount() {
     // this.waitRequest();
     this.getPermission();
+    Audio.setAudioModeAsync({
+      staysActiveInBackground: true,
+      interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+      //playThroughEarpieceAndroid: true,
+    });
   }
-  printChild() {
-    console.log(this.props.children);
-    return this.props.children;
-  }
+
+  loadPlaylist = async (playListName) => {
+    const { contents } = await getPlaylist(playListName);
+
+    return await Promise.all(contents.map((filename) => getSong(filename)));
+  };
+  randomListGen = (len) => {
+    const alist = Array.from(Array(len).keys());
+    for (let i = alist.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      let temp = alist[i];
+      alist[i] = alist[j];
+      alist[j] = temp;
+    }
+    // console.log(alist);
+    return alist;
+  };
+
+  resetRandomPlaylist = (audio, songList = null) => {
+    if (!songList) {
+      songList = this.state.songList;
+    }
+    const lst = this.randomListGen(
+      songList.length || this.state.audioFiles.length
+    );
+    if (audio !== null) {
+      const ind = songList.indexOf(audio);
+      const ind_in_lst = lst.indexOf(ind);
+      //swap
+      [lst[0], lst[ind_in_lst]] = [lst[ind_in_lst], lst[0]];
+    }
+    return lst.map((index) => this.state.audioFiles[index]);
+  };
+
+  getNextSongIndex = () => {
+    let nextSongIndex = this.state.repeatSong
+      ? this.state.curSongIndex
+      : this.state.curSongIndex + 1;
+    return nextSongIndex;
+  };
+
+  _onPlaybackStatusUpdate = async (playbackStatus) => {
+    // console.log("PRINTED");
+    let { songList, playbackObj } = this.state;
+    if (!playbackStatus.isLoaded) {
+      // Update your UI for the unloaded state
+      if (playbackStatus.error) {
+        console.log(
+          `Encountered a fatal error during playback: ${playbackStatus.error}`
+        );
+        // Send Expo team the error on Slack or the forums so we can help you debug!
+      }
+    } else {
+      // Update your UI for the loaded state
+
+      if (playbackStatus.isPlaying) {
+        this.updateState(this.state, {
+          playbackPos: playbackStatus.positionMillis,
+          playbackDur: playbackStatus.durationMillis,
+        });
+        // Update your UI for the playing state
+      } else {
+        // Update your UI for the paused state
+      }
+
+      if (playbackStatus.isBuffering) {
+        // Update your UI for the buffering state
+      }
+
+      if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
+        // The player has just finished playing and will stop. Maybe you want to play something else?
+        console.log("finished playing");
+        let nextSongIndex = this.getNextSongIndex();
+
+        if (nextSongIndex === this.state.songList.length) {
+          songList = this.resetRandomPlaylist(null, songList);
+          nextSongIndex = 0;
+        }
+
+        let audio = this.state.songList[nextSongIndex];
+        // console.log(playbackObj);
+        const status = await playNext(playbackObj, audio.uri);
+        this.updateState(this.state, {
+          soundObj: status,
+          currentAudio: audio,
+          isPlaying: true,
+          currentAudioTitle: audio.filename,
+          songList: songList,
+          curSongIndex: nextSongIndex,
+        });
+      }
+    }
+  };
+
+  handleAudioPress = async (audio, playlistName = null) => {
+    // return;
+    const { soundObj, playbackObj, currentAudio, currentAudioTitle } =
+      this.state;
+    console.log("Pressed on: ", audio.uri);
+
+    let newSongList;
+
+    if (playlistName === null) {
+      newSongList = this.state.audioFiles;
+    } else {
+      newSongList = await this.loadPlaylist(playlistName);
+    }
+
+    if (soundObj === null) {
+      // if nothing is playing (first time)
+      const playbackObj = this.initPlaybackObj();
+      newSongList = this.resetRandomPlaylist(audio, newSongList);
+      console.log("MADE NEW SONG", newSongList);
+
+      const status = await play(playbackObj, audio.uri);
+      this.updateState(this.state, {
+        playbackObj,
+        soundObj: status,
+        currentAudio: audio,
+        currentAudioTitle: audio.filename,
+        isPlaying: true,
+        songList: newSongList,
+      });
+      playbackObj.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
+      return;
+    }
+    //pause audio
+    if (
+      soundObj.isLoaded &&
+      soundObj.isPlaying &&
+      //CHANGED TO COMPARE URI
+      currentAudio.uri === audio.uri
+    ) {
+      console.log("already playing");
+      //audio is already playing
+      const status = await pause(playbackObj);
+      this.updateState(this.state, {
+        soundObj: status,
+        isPlaying: false,
+      });
+      return;
+    }
+
+    //resume audio that was previously playing
+    if (
+      soundObj.isLoaded &&
+      !soundObj.isPlaying &&
+      currentAudio.uri === audio.uri
+    ) {
+      const status = await resume(playbackObj);
+      this.updateState(this.state, {
+        soundObj: status,
+        isPlaying: true,
+      });
+      return;
+    }
+    //play another audio
+    if (
+      //soundObj.isLoaded &&
+      currentAudio.uri !== audio.uri
+    ) {
+      newSongList = this.resetRandomPlaylist(audio, newSongList);
+      const status = await playNext(playbackObj, audio.uri);
+      this.updateState(this.state, {
+        soundObj: status,
+        currentAudio: audio,
+        isPlaying: true,
+        currentAudioTitle: audio.filename,
+        songList: newSongList,
+        curSongIndex: 0,
+      });
+    }
+  };
 
   updateState = (prevState, newState = {}) => {
     this.setState({ ...prevState, ...newState });
@@ -224,9 +412,28 @@ export class AudioProvider extends Component {
             playbackDur,
             playbackPos,
             repeatOn,
-            updateState: this.updateState,
             getAudioFiles: this.getAudioFiles,
             downloadFile: this.downloadFile,
+            initPlaybackObj: this.initPlaybackObj,
+            handleAudioPress: this.handleAudioPress,
+            testState: () => console.log("TEST STATE:", this.state),
+            testAddToPlaylist: async () => {
+              console.log("starting callback");
+              const testPlayListName = "TestPlaylist";
+              console.log("starting callback2");
+              await createNewPlaylist(testPlayListName);
+              console.log("starting callback3");
+              await addToPlaylist(
+                testPlayListName,
+                this.state.audioFiles[0].filename
+              );
+              console.log("starting callback4");
+              await addToPlaylist(
+                testPlayListName,
+                this.state.audioFiles[1].filename
+              );
+              console.log(await this.loadPlaylist(testPlayListName));
+            },
           }}
         >
           {this.props.children}
